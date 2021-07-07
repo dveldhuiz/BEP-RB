@@ -499,18 +499,16 @@ noise_model4.add_all_qubit_quantum_error(sqrtswaperr, 'cz')
 
 
 # basis_gates=['u1', 'rx(pi/2)', 'cz']
-basis_gates = ['u1','u2','u3','cz'] # use U,CX for now
+basis_gates = ['u1','u2','u3','cz'] # use U,CZ for now
 
-image=[[[[0,1],[2],[3,4],[5]],[1,3,1,3]]]
 #%%
-#get_random_patterns2(nQ)
 exp=FullExperimentNQ()
-for rb_pattern in image: # adds individual experiments to a FullExperiment(uses copy.deepcopy to avoid weird behaviour)
+for rb_pattern in get_random_patterns2(nQ): # adds individual experiments to a FullExperiment(uses copy.deepcopy to avoid weird behaviour)
     rb_opts_copy=copy.deepcopy(rb_opts)
     rb_opts_copy['rb_pattern'] = rb_pattern[0]
     rb_opts_copy['length_multiplier'] = rb_pattern[1]
     print(rb_opts_copy)
-    exp.add_exp(Experiment(nQ, rb_opts_copy, basis_gates, noise_model)) 
+    exp.add_exp(Experiment(nQ, rb_opts_copy, basis_gates, noise_model)) #change noise model here manually
 
 #%%
 # Creates a 3Q RB experiment 
@@ -518,10 +516,11 @@ rb_opts_copy=copy.deepcopy(rb_opts)
 rb_opts_copy['length_vector']=np.arange(1,5,1)
 rb_opts_copy['length_multiplier'] = [1]
 rb_opts_copy['rb_pattern'] = [[i for i in range(nQ)]]
-three_q=Experiment(nQ, rb_opts_copy, basis_gates, noise_model, shots=10000) 
+three_q=Experiment(nQ, rb_opts_copy, basis_gates, noise_model, shots=10000) #change noise model here manually
 
-three_q.transpile()
-exp.experiments[0].transpile()
+# In case one only needs the transpiled circuit list
+# three_q.transpile()              
+# exp.experiments[0].transpile()
 
 #%%
 
@@ -567,6 +566,8 @@ measured_conf=three_q.rbfit.fit[0]['params_err'][1]
 # qiskit.visualization.circuit_drawer(three_q.transpile_list[0][1], output='mpl', ax=ax)
 
 #%%
+
+#Everything below is extra testing code and not needed for the prediction
 
 q1a=dict(zip(range(nQ),[0.998*np.ones(3)]*nQ))
 q2a=dict(zip(combinations(range(nQ),2),[0.99*np.ones(3)]*int(nQ*(nQ-1)/2)))
